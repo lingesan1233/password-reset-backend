@@ -1,7 +1,9 @@
+// controllers/authController.js
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// Signup Handler
 exports.signup = async (req, res) => {
   const { email, password } = req.body;
 
@@ -19,6 +21,7 @@ exports.signup = async (req, res) => {
   }
 };
 
+// Login Handler
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -37,12 +40,20 @@ exports.login = async (req, res) => {
   }
 };
 
+// Password Reset Handler
 exports.resetPassword = async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ message: 'Email is required' });
+  const { email, newPassword } = req.body;
 
-  // Simulate sending email
-  res.status(200).json({
-    message: 'Reset password link has been sent to your email (simulation)',
-  });
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: 'Password reset successful' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
 };
