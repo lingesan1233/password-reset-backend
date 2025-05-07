@@ -1,3 +1,8 @@
+import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
+
+// Signup and Login code remains the same.
+
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
