@@ -1,20 +1,33 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
+import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import authRoutes from './routes/authRoutes.js';  // Import your routes
 import dotenv from 'dotenv';
-import authRoutes from './routes/authRoutes.js';
 
+// Load environment variables
 dotenv.config();
+
+// Initialize express app
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// Middleware
+app.use(cors());  // Enable CORS for frontend access
+app.use(bodyParser.json());  // Parse JSON requests
 
-app.use('/api/auth', authRoutes);
+// Routes
+app.use('/api', authRoutes);  // Prefix /api for authentication-related routes
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
-    app.listen(process.env.PORT, () => console.log("Server running"));
-  })
-  .catch((err) => console.error(err));
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log('MongoDB connection error:', err));
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
